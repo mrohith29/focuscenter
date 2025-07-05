@@ -1,13 +1,13 @@
 # Today's TODOs: FocusCenter Project
 
 ## 1. Backend Foundation
-- [ ] Design and implement Python database models to match the Supabase schema (users, goals, tasks, ai_chats, motivational_quotes, motivations, analytics, notes)
+- [x] Design and implement Python database models to match the Supabase schema (users, goals, tasks, ai_chats, motivational_quotes, motivations, analytics, notes)
 
 ## 2. Backend API
-- [ ] Set up CRUD API endpoints for each model (users, goals, tasks, etc.)
+- [x] Set up CRUD API endpoints for each model (users, goals, tasks, etc.)
 
 ## 3. Agent Modules
-- [ ] Create stubs for agent modules (Goal Understanding, Task Breakdown, Distraction Tracking, Motivation, Analytics)
+- [x] Create stubs for agent modules (Goal Understanding, Task Breakdown, Distraction Tracking, Motivation, Analytics)
 
 ## 4. Frontend Skeleton
 - [ ] Scaffold React frontend: basic navigation, placeholder pages for onboarding, goals, tasks, chat, motivation, analytics, notes

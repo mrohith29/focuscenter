@@ -1,7 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
-from app.api import users_router, goals_router
+from app.api import users_router, goals_router, tasks_router, motivational_quotes_router, motivations_router, analytics_router, notes_router
+from app.database import get_supabase
 
 app = FastAPI()
 
@@ -16,10 +17,24 @@ app.add_middleware(
 
 app.include_router(users_router)
 app.include_router(goals_router)
+app.include_router(tasks_router)
+app.include_router(motivational_quotes_router)
+app.include_router(motivations_router)
+app.include_router(analytics_router)
+app.include_router(notes_router)
 
 @app.get("/")
 def root():
+    print(list({1:2, 2:3}))
     return {"message": "FocusCenter API is running"}
+
+@app.get("/credentials")
+def credentials():
+    import os
+    return {
+        "supabaseUrl": os.getenv("REACT_APP_SUPABASE_URL"),
+        "supabaseKey": os.getenv("REACT_APP_SUPABASE_ANON_KEY")
+    }
 
 # Only run the server if this script is executed directly
 if __name__ == "__main__":
