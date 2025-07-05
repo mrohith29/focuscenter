@@ -11,6 +11,7 @@ function App() {
       .then(data => setMessage(data.message))
       .catch(() => setMessage('Could not connect to backend.'))
   }, [])
+
   return (
     <>
       <div>
