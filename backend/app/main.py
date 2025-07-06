@@ -25,7 +25,6 @@ app.include_router(notes_router)
 
 @app.get("/")
 def root():
-    print(list({1:2, 2:3}))
     return {"message": "FocusCenter API is running"}
 
 @app.get("/credentials")
@@ -38,4 +37,4 @@ def credentials():
 
 # Only run the server if this script is executed directly
 if __name__ == "__main__":
-    uvicorn.run("app.main:app", host="127.0.0.1", port=8000, reload=True)
+    uvicorn.run("app.main:app", host="127.0.0.1", port=8000, reload=True) # python -m app.main
