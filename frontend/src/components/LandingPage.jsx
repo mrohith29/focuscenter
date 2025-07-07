@@ -47,7 +47,7 @@ const AnimatedWord = () => {
     <span
       className="inline-block align-middle mx-2 min-w-[130px] text-center"
       aria-live="polite"
-      style={{ verticalAlign: 'middle' }}
+      style={{ verticalAlign: 'middle', position: 'relative', top: '-7px' }}
     >
       <span
         key={animatedWords[index]}
@@ -281,8 +281,8 @@ const LandingPage = ({ setActiveView, isMenuOpen, setIsMenuOpen }) => {
               },
               {
                 icon: <Calendar className="h-8 w-8 text-purple-400" />,
-                title: "Habit Building",
-                description: "Create lasting positive habits with streak tracking and smart reminders"
+                title: "Note Taking",
+                description: "Take notes, organize your thoughts, and keep track of your progress"
               },
               {
                 icon: <Users className="h-8 w-8 text-pink-400" />,
