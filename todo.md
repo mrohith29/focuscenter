@@ -40,4 +40,12 @@
   - Depends on: testing
 - [ ] **Write documentation**
   - Setup, usage, contribution guidelines
-  - Depends on: deployment 
+  - Depends on: deployment
+
+# TODO: Secure User Authentication Implementation
+
+- [ ] Add password hashing and storage to user creation (signup) in the backend, so passwords are never stored in plaintext.
+- [ ] Implement a login endpoint in the backend that verifies user credentials and returns a secure token (e.g., JWT) on success.
+- [ ] Add token-based authentication middleware to protect user endpoints as needed.
+- [ ] Update the frontend signup form to send hashed password to the backend and handle errors.
+- [ ] Update the frontend login form to authenticate with the backend, store the token, and handle errors. 

@@ -170,7 +170,7 @@ const BackToTopButton = () => {
   if (!visible) return null;
   return (
     <button
-      onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+      onClick={() => setActiveView('login')}
       className="fixed bottom-8 right-8 z-50 bg-indigo-600 hover:bg-indigo-700 text-white p-3 rounded-full shadow-lg transition-colors"
       aria-label="Back to top"
     >
@@ -201,7 +201,7 @@ const LandingPage = ({ setActiveView, isMenuOpen, setIsMenuOpen }) => {
               <a href="#how-it-works" className="text-white/80 hover:text-white transition-colors">How It Works</a>
               <a href="#pricing" className="text-white/80 hover:text-white transition-colors">Pricing</a>
               <button 
-                onClick={() => setActiveView('dashboard')}
+                onClick={() => setActiveView('login')}
                 className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition-colors"
               >
                 Get Started
@@ -232,7 +232,7 @@ const LandingPage = ({ setActiveView, isMenuOpen, setIsMenuOpen }) => {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button 
-                onClick={() => setActiveView('dashboard')}
+                onClick={() => setActiveView('login')}
                 className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors flex items-center justify-center space-x-2"
               >
                 <Play className="h-5 w-5" />
@@ -379,7 +379,7 @@ const LandingPage = ({ setActiveView, isMenuOpen, setIsMenuOpen }) => {
             Join thousands of users who have transformed their lives with AchieveMind
           </p>
           <button 
-            onClick={() => setActiveView('dashboard')}
+            onClick={() => setActiveView('login')}
             className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors inline-flex items-center space-x-2"
           >
             <span>Start Your Free Trial</span>
@@ -468,7 +468,7 @@ const LandingPage = ({ setActiveView, isMenuOpen, setIsMenuOpen }) => {
               <a href="#pricing" className="hover:text-white transition-colors">Pricing</a>
             </nav>
             <button
-              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              onClick={() => setActiveView('login')}
               className="mt-2 bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg font-semibold transition-colors shadow-md"
             >
               Get Started
