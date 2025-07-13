@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
+import { BrowserRouter as Router, Routes, Route, useNavigate, Navigate } from 'react-router-dom';
 import LandingPage from './components/LandingPage';
 import Dashboard from './components/Dashboard';
 import Login from './components/Login';
 import Signup from './components/Signup';
 
-function App() {
+function AppRoutes() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [activeView, setActiveView] = useState('landing');
   const [selectedGoal, setSelectedGoal] = useState(null);
-  const [authView, setAuthView] = useState('login'); // 'login' or 'signup'
-  const [user, setUser] = useState(null); // null if not logged in
+  const [user, setUser] = useState(null);
+  const navigate = useNavigate();
 
   const goals = [
     {
@@ -49,43 +49,40 @@ function App() {
   ];
 
   // Handlers for login/signup
-  const handleLogin = (credentials) => {
-    // TODO: Integrate with backend
-    setUser({ email: credentials.email });
-    setActiveView('dashboard');
+  const handleLogin = (userObj) => {
+    setUser(userObj);
+    navigate('/dashboard');
   };
-  const handleSignup = (info) => {
-    // TODO: Integrate with backend
-    setUser({ name: info.name, email: info.email });
-    setActiveView('dashboard');
+  const handleSignup = (userObj) => {
+    setUser(userObj);
+    navigate('/dashboard');
   };
   const handleLogout = () => {
     setUser(null);
-    setActiveView('landing');
+    navigate('/');
   };
 
-  // Routing logic
-  if (!user) {
-    if (activeView === 'login') {
-      return <Login onLogin={handleLogin} onSwitchToSignup={() => setActiveView('signup')} onBackToLanding={() => setActiveView('landing')} />;
-    }
-    if (activeView === 'signup') {
-      return <Signup onSignup={handleSignup} onSwitchToLogin={() => setActiveView('login')} onBackToLanding={() => setActiveView('landing')} />;
-    }
-    return <LandingPage setActiveView={setActiveView} isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />;
-  }
-
-  // User is logged in
   return (
-    <Dashboard
-      setActiveView={setActiveView}
-      selectedGoal={selectedGoal}
-      setSelectedGoal={setSelectedGoal}
-      goals={goals}
-      aiAgents={aiAgents}
-      user={user}
-      onLogout={handleLogout}
-    />
+    <Routes>
+      <Route path="/" element={<LandingPage setActiveView={(view) => {
+        if (view === 'login') navigate('/login');
+        else if (view === 'signup') navigate('/signup');
+        else if (view === 'dashboard') navigate('/dashboard');
+        else navigate('/');
+      }} isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />} />
+      <Route path="/login" element={user ? <Navigate to="/dashboard" /> : <Login onLogin={handleLogin} onSwitchToSignup={() => navigate('/signup')} onBackToLanding={() => navigate('/')} />} />
+      <Route path="/signup" element={user ? <Navigate to="/dashboard" /> : <Signup onSignup={handleSignup} onSwitchToLogin={() => navigate('/login')} onBackToLanding={() => navigate('/')} />} />
+      <Route path="/dashboard" element={user ? <Dashboard setActiveView={() => { }} selectedGoal={selectedGoal} setSelectedGoal={setSelectedGoal} goals={goals} aiAgents={aiAgents} user={user} onLogout={handleLogout} /> : <Navigate to="/login" />} />
+      <Route path="*" element={<Navigate to="/" />} />
+    </Routes>
+  );
+}
+
+function App() {
+  return (
+    <Router>
+      <AppRoutes />
+    </Router>
   );
 }
 

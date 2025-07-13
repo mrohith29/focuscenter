@@ -1,20 +1,61 @@
 import React, { useState } from 'react';
 import { Brain } from 'lucide-react';
 import { ArrowLeft } from 'lucide-react';
+import { supabase } from '../supabaseClient';
+
+async function saveUserAndProfile(name, email, userId) {
+  await supabase.from('users').upsert([
+    {
+      id: userId,
+      email,
+      name,
+      created_at: new Date().toISOString()
+    }
+  ]);
+  await supabase.from('profiles').upsert([
+    { id: userId, name }
+  ]);
+}
 
 const Login = ({ onLogin, onSwitchToSignup, onBackToLanding }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
     if (!email || !password) {
       setError('Please enter both email and password.');
       return;
     }
-    setError('');
-    onLogin({ email, password });
+    setLoading(true);
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) {
+        if (error.message.toLowerCase().includes('email not confirmed')) {
+          setError('Please confirm your email before logging in.');
+        } else {
+          setError(error.message || 'Login failed.');
+        }
+        setLoading(false);
+        return;
+      }
+      if (data && data.session && data.user) {
+        // Always get the name from Supabase Auth user metadata
+        let name = data.user.user_metadata?.display_name || '';
+        await saveUserAndProfile(name, data.user.email, data.user.id);
+        localStorage.removeItem('pendingProfileName');
+        onLogin({ id: data.user.id, email: data.user.email, token: data.session.access_token });
+      } else {
+        setError('Login failed.');
+      }
+    } catch (err) {
+      setError('Network error. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -45,14 +86,14 @@ const Login = ({ onLogin, onSwitchToSignup, onBackToLanding }) => {
         <h2 className="text-2xl font-bold text-white mb-6 text-center">Login to Focus Center</h2>
         {error && <div className="mb-4 text-red-400 text-sm">{error}</div>}
         <div className="mb-4">
-          <label className="block text-white/80 mb-1">Email</label>
-          <input type="email" className="w-full px-3 py-2 rounded bg-white/20 text-white focus:outline-none" value={email} onChange={e => setEmail(e.target.value)} />
+          <label htmlFor="login-email" className="block text-white/80 mb-1">Email</label>
+          <input id="login-email" type="email" className="w-full px-3 py-2 rounded bg-white/20 text-white focus:outline-none" value={email} onChange={e => setEmail(e.target.value)} />
         </div>
         <div className="mb-6">
-          <label className="block text-white/80 mb-1">Password</label>
-          <input type="password" className="w-full px-3 py-2 rounded bg-white/20 text-white focus:outline-none" value={password} onChange={e => setPassword(e.target.value)} />
+          <label htmlFor="login-password" className="block text-white/80 mb-1">Password</label>
+          <input id="login-password" type="password" className="w-full px-3 py-2 rounded bg-white/20 text-white focus:outline-none" value={password} onChange={e => setPassword(e.target.value)} />
         </div>
-        <button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded font-semibold transition-colors mb-4">Login</button>
+        <button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded font-semibold transition-colors mb-4" disabled={loading}>{loading ? 'Logging in...' : 'Login'}</button>
         <div className="text-center text-white/70 text-sm">
           Don't have an account?{' '}
           <button type="button" className="text-indigo-400 hover:underline" onClick={onSwitchToSignup}>Sign up</button>

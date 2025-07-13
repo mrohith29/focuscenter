@@ -1,16 +1,8 @@
 from fastapi import APIRouter, HTTPException
 from ..database import get_supabase
 from typing import List
-import bcrypt
-import jwt
-import os
-from datetime import datetime, timedelta
 
 router = APIRouter(prefix="/users", tags=["users"])
-
-JWT_SECRET = os.getenv("JWT_SECRET", "supersecretkey")
-JWT_ALGORITHM = "HS256"
-JWT_EXP_DELTA_SECONDS = 3600
 
 @router.get("/", response_model=List[dict])
 def get_users():
@@ -26,51 +18,4 @@ def get_user(user_id: str):
         raise HTTPException(status_code=404, detail="User not found")
     return response.data
 
-@router.post("/")
-def create_user(user: dict):
-    supabase = get_supabase()
-    if 'password' in user:
-        hashed = bcrypt.hashpw(user['password'].encode('utf-8'), bcrypt.gensalt())
-        user['password'] = hashed.decode('utf-8')
-    response = supabase.table("users").insert(user).execute()
-    if response.error:
-        raise HTTPException(status_code=400, detail=response.error.message)
-    return response.data[0]
-
-@router.post("/login")
-def login_user(credentials: dict):
-    supabase = get_supabase()
-    email = credentials.get('email')
-    password = credentials.get('password')
-    if not email or not password:
-        raise HTTPException(status_code=400, detail="Email and password required.")
-    response = supabase.table("users").select("*").eq("email", email).single().execute()
-    user = response.data
-    if not user:
-        raise HTTPException(status_code=401, detail="Invalid email or password.")
-    hashed_pw = user.get('password')
-    if not hashed_pw or not bcrypt.checkpw(password.encode('utf-8'), hashed_pw.encode('utf-8')):
-        raise HTTPException(status_code=401, detail="Invalid email or password.")
-    payload = {
-        'user_id': user.get('id'),
-        'email': user.get('email'),
-        'exp': datetime.utcnow() + timedelta(seconds=JWT_EXP_DELTA_SECONDS)
-    }
-    token = jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
-    return {"token": token, "user": {"id": user.get('id'), "email": user.get('email')}}
-
-@router.put("/{user_id}")
-def update_user(user_id: str, user: dict):
-    supabase = get_supabase()
-    response = supabase.table("users").update(user).eq("id", user_id).execute()
-    if response.error:
-        raise HTTPException(status_code=400, detail=response.error.message)
-    return {"message": "User updated"}
-
-@router.delete("/{user_id}")
-def delete_user(user_id: str):
-    supabase = get_supabase()
-    response = supabase.table("users").delete().eq("id", user_id).execute()
-    if response.error:
-        raise HTTPException(status_code=400, detail=response.error.message)
-    return {"message": "User deleted"} 
+# You can keep update/delete endpoints for user profile management if needed, but remove any password or auth logic. 
