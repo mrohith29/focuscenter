@@ -3,20 +3,6 @@ import { Brain } from 'lucide-react';
 import { ArrowLeft } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 
-async function saveUserAndProfile(name, email, userId) {
-  await supabase.from('users').upsert([
-    {
-      id: userId,
-      email,
-      name,
-      created_at: new Date().toISOString()
-    }
-  ]);
-  await supabase.from('profiles').upsert([
-    { id: userId, name }
-  ]);
-}
-
 const Login = ({ onLogin, onSwitchToSignup, onBackToLanding }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -43,11 +29,13 @@ const Login = ({ onLogin, onSwitchToSignup, onBackToLanding }) => {
         return;
       }
       if (data && data.session && data.user) {
-        // Always get the name from Supabase Auth user metadata
-        let name = data.user.user_metadata?.display_name || '';
-        await saveUserAndProfile(name, data.user.email, data.user.id);
-        localStorage.removeItem('pendingProfileName');
-        onLogin({ id: data.user.id, email: data.user.email, token: data.session.access_token });
+        // Use user_metadata for name/profile fields
+        onLogin({
+          id: data.user.id,
+          email: data.user.email,
+          name: data.user.user_metadata?.display_name || '',
+          token: data.session.access_token
+        });
       } else {
         setError('Login failed.');
       }

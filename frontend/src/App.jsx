@@ -1,15 +1,52 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useNavigate, Navigate } from 'react-router-dom';
 import LandingPage from './components/LandingPage';
 import Dashboard from './components/Dashboard';
 import Login from './components/Login';
 import Signup from './components/Signup';
+import Goals from './components/Goals';
+import GoalDetail from './components/GoalDetail';
+import Footer from './components/Footer';
+import DashboardLayout from './components/DashboardLayout';
+import { supabase } from './supabaseClient';
 
 function AppRoutes() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [selectedGoal, setSelectedGoal] = useState(null);
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // On mount, check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session && session.user) {
+        setUser({
+          id: session.user.id,
+          email: session.user.email,
+          name: session.user.user_metadata?.display_name || '',
+          token: session.access_token,
+          user_metadata: session.user.user_metadata
+        });
+      }
+    });
+    // Listen for auth state changes
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session && session.user) {
+        setUser({
+          id: session.user.id,
+          email: session.user.email,
+          name: session.user.user_metadata?.display_name || '',
+          token: session.access_token,
+          user_metadata: session.user.user_metadata
+        });
+      } else {
+        setUser(null);
+      }
+    });
+    return () => {
+      listener?.subscription.unsubscribe();
+    };
+  }, []);
 
   const goals = [
     {
@@ -72,7 +109,21 @@ function AppRoutes() {
       }} isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />} />
       <Route path="/login" element={user ? <Navigate to="/dashboard" /> : <Login onLogin={handleLogin} onSwitchToSignup={() => navigate('/signup')} onBackToLanding={() => navigate('/')} />} />
       <Route path="/signup" element={user ? <Navigate to="/dashboard" /> : <Signup onSignup={handleSignup} onSwitchToLogin={() => navigate('/login')} onBackToLanding={() => navigate('/')} />} />
-      <Route path="/dashboard" element={user ? <Dashboard setActiveView={() => { }} selectedGoal={selectedGoal} setSelectedGoal={setSelectedGoal} goals={goals} aiAgents={aiAgents} user={user} onLogout={handleLogout} /> : <Navigate to="/login" />} />
+      <Route path="/dashboard" element={user ? (
+        <DashboardLayout onLogout={handleLogout}>
+          <Dashboard setActiveView={() => { }} selectedGoal={selectedGoal} setSelectedGoal={setSelectedGoal} goals={goals} aiAgents={aiAgents} user={user} onLogout={handleLogout} />
+        </DashboardLayout>
+      ) : <Navigate to="/login" />} />
+      <Route path="/goals" element={user ? (
+        <DashboardLayout onLogout={handleLogout}>
+          <Goals setSelectedGoal={setSelectedGoal} selectedGoal={selectedGoal} user={user} />
+        </DashboardLayout>
+      ) : <Navigate to="/login" />} />
+      <Route path="/goals/:goalId" element={user ? (
+        <DashboardLayout onLogout={handleLogout}>
+          <GoalDetail goals={goals} aiAgents={aiAgents} user={user} />
+        </DashboardLayout>
+      ) : <Navigate to="/login" />} />
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   );
@@ -82,6 +133,7 @@ function App() {
   return (
     <Router>
       <AppRoutes />
+      <Footer />
     </Router>
   );
 }

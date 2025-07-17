@@ -18,3 +18,15 @@
 ---
 - [ ] Commit and push progress regularly
 - [ ] Update this file as tasks are completed or reprioritized 
+
+---
+
+## Dashboard & Goals/Analytics Enhancements (Next Steps)
+
+1. Add New Goal Button on Goals page (modal form, save to Supabase, show newest first)
+2. Enhance Goal Cards: show creation time, add edit/delete button, visually appealing
+3. Integrate with Supabase for all goal data (CRUD, subgoals, streaks, creation time)
+4. Polish all pages for visual consistency and appeal
+5. Analytics Page: overall trends (total goals, completed, streaks, etc.)
+6. Goal Analytics: per-goal stats on detail page (progress, streak, completion rate)
+7. Dashboard Analytics: common trends for all goals (charts, stats) 
