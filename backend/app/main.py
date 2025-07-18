@@ -4,7 +4,6 @@ import uvicorn
 from app.api import users_router, goals_router, tasks_router, motivational_quotes_router, motivations_router, analytics_router, notes_router, orchestrator_router
 from app.database import get_supabase, SUPABASE_URL, SUPABASE_KEY
 from jose import jwt
-import os
 
 app = FastAPI()
 

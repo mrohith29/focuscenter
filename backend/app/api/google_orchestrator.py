@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Request, HTTPException
-from app.google_orchestrator import root_agent
+from ..google_orchestrator import root_agent  # Use relative import
 
 router = APIRouter(prefix="/orchestrator", tags=["orchestrator"])
 
