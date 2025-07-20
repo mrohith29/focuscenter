@@ -7,6 +7,14 @@ from backend.app.utils.gemini import GeminiLLM
 from .prompts.distraction_tracking_agent_prompt import DISTRACTION_TRACKING_AGENT_PROMPT
 
 def handle_distraction_tracking_action(input_dict):
+    # Accept both direct dict and {'input': dict}
+    if isinstance(input_dict, dict):
+        if set(input_dict.keys()) == {"input"} and isinstance(input_dict["input"], dict):
+            input_dict = input_dict["input"]
+        elif "input" in input_dict and isinstance(input_dict["input"], dict):
+            merged = input_dict["input"].copy()
+            merged.update({k: v for k, v in input_dict.items() if k != "input"})
+            input_dict = merged
     query = input_dict.get("query")
     if not query:
         return f"Error: Missing required input key 'query'. Got: {input_dict}"
